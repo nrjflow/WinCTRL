@@ -1,6 +1,6 @@
 #include <Windows.h>
 
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	WNDCLASSEX wc;
@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	switch (msg){
 	case WM_CREATE: {
-		HWND hLabel=CreateWindowEx(WS_EX_CLIENTEDGE,"LABEL", "jjj", WS_CHILD | WS_VISIBLE, 20, 20, 80, 25, hwnd, (HMENU)1,GetModuleHandle(NULL), NULL);
+		HWND hLabel = CreateWindowEx(WS_EX_CLIENTEDGE, "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 2, 2, 100, 100, hwnd, (HMENU)123, NULL, NULL);
 		if (hLabel==NULL) {
 			MessageBox(NULL, "Error registering", "Error", MB_ICONEXCLAMATION | MB_OK);
 		}
