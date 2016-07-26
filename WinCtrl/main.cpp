@@ -1,12 +1,29 @@
 #include <Windows.h>
-
+#include <WinUser.h>
+#include <stdio.h>
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+DWORD WINAPI HookThreadFunc(LPVOID);
+HHOOK hhk;
+HWND hLabel;
+
+_declspec(dllexport) LRESULT CALLBACK MouseEvent(int Code, WPARAM wParam, LPARAM lParam) {
+	
+	if (Code == HC_ACTION && wParam == WM_MOUSEMOVE) {
+		MSLLHOOKSTRUCT mouse = *((MSLLHOOKSTRUCT*)lParam);
+		HWND test = WindowFromPoint(mouse.pt);
+		char xx[1000];
+		sprintf_s(xx, "%p", test);
+		//_itoa_s(mouse.pt.x, xx, 10);
+		SetWindowTextA(hLabel, xx);
+	}
+	return CallNextHookEx(hhk, Code, wParam, lParam);
+}
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine, int nCmdShow) {
+
 	WNDCLASSEX wc;
 	HWND hwnd;
 	MSG msg;
-
 	wc.cbSize = sizeof(WNDCLASSEX);
 	wc.style = 0;
 	wc.cbClsExtra = 0;
@@ -28,6 +45,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
 
+	
+
 	while (GetMessage(&msg,NULL,0,0)>0){
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -38,7 +57,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	switch (msg){
 	case WM_CREATE: {
-		HWND hLabel = CreateWindowEx(WS_EX_CLIENTEDGE, "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 2, 2, 100, 100, hwnd, (HMENU)123, NULL, NULL);
+		HANDLE hookThread;
+		DWORD dwThread;
+		hookThread = CreateThread(0, 0, HookThreadFunc, NULL, NULL,&dwThread);
+
+
+		hLabel = CreateWindowEx(WS_EX_CLIENTEDGE, "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 2, 2, 100, 100, hwnd, (HMENU)123, NULL, NULL);
 		if (hLabel==NULL) {
 			MessageBox(NULL, "Error registering", "Error", MB_ICONEXCLAMATION | MB_OK);
 		}
@@ -54,4 +78,18 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		return DefWindowProc(hwnd,msg,wParam,lParam);
 	}
 	return 0;
+}
+
+
+
+DWORD WINAPI HookThreadFunc(LPVOID Param) {
+	HINSTANCE exeHandle = GetModuleHandle(NULL);
+	hhk = SetWindowsHookEx(WH_MOUSE_LL, MouseEvent, exeHandle, NULL);
+	MSG msg;
+	while (GetMessage(&msg,NULL,0,0)) {
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	UnhookWindowsHookEx(hhk);
+	return 1;
 }
