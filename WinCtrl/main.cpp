@@ -86,8 +86,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		hookThread = CreateThread(0, 0, HookThreadFunc, NULL, NULL,&dwThread);
 
 
-		hLabel = CreateWindowEx(WS_EX_CLIENTEDGE , "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 2, 2, 100, 50, hwnd, (HMENU)123, NULL, NULL);
-		hButton = CreateWindowEx(WS_EX_CLIENTEDGE, "BUTTON", "Click and drag", WS_CHILD | WS_VISIBLE , 94, 80, 153, 25, hwnd, (HMENU)hookButton, NULL, NULL);
+		hLabel = CreateWindowEx(WS_EX_CLIENTEDGE , "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 241,80 , 80, 25, hwnd, (HMENU)123, NULL, NULL);
+		hButton = CreateWindowEx(WS_EX_CLIENTEDGE, "BUTTON", "Click and drag", WS_CHILD | WS_VISIBLE , 87, 80, 154, 25, hwnd, (HMENU)hookButton, NULL, NULL);
 		if (hLabel==NULL) {
 			MessageBox(NULL, "Error registering", "Error", MB_ICONEXCLAMATION | MB_OK);
 		}
