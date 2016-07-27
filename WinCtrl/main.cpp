@@ -8,13 +8,24 @@ HWND hLabel;
 
 _declspec(dllexport) LRESULT CALLBACK MouseEvent(int Code, WPARAM wParam, LPARAM lParam) {
 	
-	if (Code == HC_ACTION && wParam == WM_MOUSEMOVE) {
-		MSLLHOOKSTRUCT mouse = *((MSLLHOOKSTRUCT*)lParam);
-		HWND test = WindowFromPoint(mouse.pt);
-		char xx[1000];
-		sprintf_s(xx, "%p", test);
-		//_itoa_s(mouse.pt.x, xx, 10);
-		SetWindowTextA(hLabel, xx);
+	if (Code == HC_ACTION) {
+		switch (wParam)
+		{
+		case WM_MOUSEMOVE:
+		{
+			MSLLHOOKSTRUCT mouse = *((MSLLHOOKSTRUCT*)lParam);
+			HWND test = WindowFromPoint(mouse.pt);
+			char strHandle[64];
+			sprintf_s(strHandle, "%p", test);
+			SetWindowTextA(hLabel, strHandle);
+		}
+		break;
+		case WM_LBUTTONUP:
+			
+		default:
+			break;
+		}
+		
 	}
 	return CallNextHookEx(hhk, Code, wParam, lParam);
 }
