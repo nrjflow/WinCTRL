@@ -5,7 +5,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 DWORD WINAPI HookThreadFunc(LPVOID);
 HHOOK hhk;
 HWND hLabel;
-
+#define hookButton 12
 _declspec(dllexport) LRESULT CALLBACK MouseEvent(int Code, WPARAM wParam, LPARAM lParam) {
 	
 	if (Code == HC_ACTION) {
@@ -74,6 +74,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
 
 		hLabel = CreateWindowEx(WS_EX_CLIENTEDGE, "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 2, 2, 100, 100, hwnd, (HMENU)123, NULL, NULL);
+		CreateWindowEx(WS_EX_CLIENTEDGE, "BUTTON", "Click and drag", WS_CHILD | WS_VISIBLE , 100, 100, 100, 20, hwnd, (HMENU)hookButton, NULL, NULL);
 		if (hLabel==NULL) {
 			MessageBox(NULL, "Error registering", "Error", MB_ICONEXCLAMATION | MB_OK);
 		}
