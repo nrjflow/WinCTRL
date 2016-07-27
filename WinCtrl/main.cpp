@@ -1,11 +1,14 @@
 #include <Windows.h>
 #include <WinUser.h>
 #include <stdio.h>
+
+#define hookButton 12
+
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 DWORD WINAPI HookThreadFunc(LPVOID);
 HHOOK hhk;
-HWND hLabel, hButton;
-#define hookButton 12
+HWND targetHandle,hLabel, hButton;
+int interceptIsOn = 0;
 _declspec(dllexport) LRESULT CALLBACK MouseEvent(int Code, WPARAM wParam, LPARAM lParam) {
 	
 	if (Code == HC_ACTION) {
@@ -13,17 +16,25 @@ _declspec(dllexport) LRESULT CALLBACK MouseEvent(int Code, WPARAM wParam, LPARAM
 		{
 		case WM_MOUSEMOVE:
 		{
-			MSLLHOOKSTRUCT mouse = *((MSLLHOOKSTRUCT*)lParam);
-			HWND test = WindowFromPoint(mouse.pt);
-			char strHandle[64];
-			sprintf_s(strHandle, "%p", test);
-			SetWindowTextA(hLabel, strHandle);
+			if (interceptIsOn == 1) {
+				MSLLHOOKSTRUCT mouse = *((MSLLHOOKSTRUCT*)lParam);
+				HWND targetHandle = WindowFromPoint(mouse.pt);
+				char strHandle[64];
+				sprintf_s(strHandle, "%p", targetHandle);
+				SetWindowTextA(hLabel, strHandle);
+			}			
 		}
-		break;
+			break;
 		case WM_LBUTTONUP:
+			EnableWindow(hButton, true);
+			interceptIsOn = 0;
+			break;
+		case WM_LBUTTONDOWN:
 			if (WindowFromPoint((*((MSLLHOOKSTRUCT*)lParam)).pt) == hButton){
-				MessageBox(NULL, "Maaa nigga", "", MB_OK);
+				interceptIsOn = 1;
+				EnableWindow(hButton,false);
 			}
+			break;
 		default:
 			break;
 		}
@@ -53,7 +64,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	if (!RegisterClassEx(&wc)) {
 		MessageBox(NULL, "Error registering", "Error", MB_ICONEXCLAMATION | MB_OK);
 	}
-	hwnd = CreateWindowEx(WS_EX_CLIENTEDGE, "FirstWnd", "Window Controller", WS_OVERLAPPEDWINDOW, 490, 80, 340, 420, NULL, NULL, hInstance, NULL);
+	hwnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_TOPMOST, "FirstWnd", "Window Controller", WS_OVERLAPPEDWINDOW^WS_THICKFRAME^WS_MAXIMIZEBOX, 500, 100, 340, 420, NULL, NULL, hInstance, NULL);
 
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
@@ -75,8 +86,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		hookThread = CreateThread(0, 0, HookThreadFunc, NULL, NULL,&dwThread);
 
 
-		hLabel = CreateWindowEx(WS_EX_CLIENTEDGE, "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 2, 2, 100, 100, hwnd, (HMENU)123, NULL, NULL);
-		hButton = CreateWindowEx(WS_EX_CLIENTEDGE, "BUTTON", "Click and drag", WS_CHILD | WS_VISIBLE , 100, 100, 100, 20, hwnd, (HMENU)hookButton, NULL, NULL);
+		hLabel = CreateWindowEx(WS_EX_CLIENTEDGE , "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 2, 2, 100, 50, hwnd, (HMENU)123, NULL, NULL);
+		hButton = CreateWindowEx(WS_EX_CLIENTEDGE, "BUTTON", "Click and drag", WS_CHILD | WS_VISIBLE , 94, 80, 153, 25, hwnd, (HMENU)hookButton, NULL, NULL);
 		if (hLabel==NULL) {
 			MessageBox(NULL, "Error registering", "Error", MB_ICONEXCLAMATION | MB_OK);
 		}
