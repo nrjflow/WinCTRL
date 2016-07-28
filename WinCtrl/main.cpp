@@ -1,7 +1,9 @@
 #include <Windows.h>
 #include <WinUser.h>
 #include <stdio.h>
-
+#pragma comment(linker,"\"/manifestdependency:type='win32' \
+name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
+processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #define hookButton 12
 
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
@@ -56,7 +58,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	wc.hIcon = LoadIcon(NULL, IDI_APPLICATION);
 	wc.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
 	wc.lpszClassName = "FirstWnd";
-	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+	wc.hbrBackground = (HBRUSH)(COLOR_WINDOW);
 	wc.lpszMenuName = NULL;
 	wc.hInstance = hInstance;
 	wc.lpfnWndProc = WndProc;
@@ -86,8 +88,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		hookThread = CreateThread(0, 0, HookThreadFunc, NULL, NULL,&dwThread);
 
 
-		hLabel = CreateWindowEx(WS_EX_CLIENTEDGE , "STATIC", "ggg", WS_CHILD | WS_VISIBLE, 241,80 , 80, 25, hwnd, (HMENU)123, NULL, NULL);
-		hButton = CreateWindowEx(WS_EX_CLIENTEDGE, "BUTTON", "Click and drag", WS_CHILD | WS_VISIBLE , 87, 80, 154, 25, hwnd, (HMENU)hookButton, NULL, NULL);
+		hLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "Handle", WS_CHILD | WS_VISIBLE |SS_CENTER, 241, 80, 80, 25, hwnd, (HMENU)123, NULL, NULL);
+		hButton = CreateWindowEx(WS_EX_STATICEDGE, "BUTTON", "Capture window", WS_CHILD | WS_VISIBLE , 87, 80, 154, 25, hwnd, (HMENU)hookButton, NULL, NULL);
 		if (hLabel==NULL) {
 			MessageBox(NULL, "Error registering", "Error", MB_ICONEXCLAMATION | MB_OK);
 		}
