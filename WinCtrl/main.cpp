@@ -12,15 +12,17 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 DWORD WINAPI HookThreadFunc(LPVOID);
 HHOOK hhk;
-HWND targetHandle,tmpTargetHandle, hHexHandlerLabel, hIntHandlerLabel, hWindowTitleLabel, hCaptureButton;
+HWND targetHandle,tmpTargetHandle, hHexHandlerLabel, hIntHandlerLabel, hWindowTitleLabel, hWindowClassNameLabel, hCaptureButton;
 int interceptIsOn = 0;
 
 void updateLabelWithHandles() {
-	char strHexHandle[64], strIntHandle[64], title[500];
+	char strHexHandle[64], strIntHandle[64], title[500], className[500];
 	sprintf_s(strHexHandle, "%p", targetHandle);
 	sprintf_s(strIntHandle, "%d", targetHandle);
 	GetWindowText(targetHandle, title, 500);
+	GetClassName(targetHandle, className, 500);
 	SetWindowTextA(hWindowTitleLabel, title);
+	SetWindowTextA(hWindowClassNameLabel, className);
 	SetWindowTextA(hHexHandlerLabel, strHexHandle);
 	SetWindowTextA(hIntHandlerLabel, strIntHandle);
 }
@@ -102,6 +104,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		hHexHandlerLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "Hex Handle", WS_CHILD | WS_VISIBLE |SS_CENTER, 7, 80, 80, 25, hwnd, (HMENU)123, NULL, NULL);
 		hIntHandlerLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "Int Handle", WS_CHILD | WS_VISIBLE | SS_CENTER, 241, 80, 80, 25, hwnd, (HMENU)124, NULL, NULL);
 		hWindowTitleLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "Name", WS_CHILD | WS_VISIBLE | SS_CENTER, 7, 55, 314, 25, hwnd, (HMENU)125, NULL, NULL);
+		hWindowClassNameLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "ClassName", WS_CHILD | WS_VISIBLE | SS_CENTER, 7, 105, 314, 25, hwnd, (HMENU)126, NULL, NULL);
 
 		hCaptureButton = CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Capture window", WS_CHILD | WS_VISIBLE, 87, 80, 154, 25, hwnd, (HMENU)hookButton, NULL, NULL);
 		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Parent", WS_CHILD | WS_VISIBLE, 87, 150, 154, 25, hwnd, (HMENU)getParentButton, NULL, NULL);
