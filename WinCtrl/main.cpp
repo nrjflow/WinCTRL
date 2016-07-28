@@ -5,12 +5,25 @@
 name='Microsoft.Windows.Common-Controls' version='6.0.0.0' \
 processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #define hookButton 12
-
+#define getParentButton 13
+#define getChildButton 14
+#define getPrevButton 15
+#define getNextButton 16
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 DWORD WINAPI HookThreadFunc(LPVOID);
 HHOOK hhk;
-HWND targetHandle, hHexHandlerLabel, hIntHandlerLabel, hCaptureButton;
+HWND targetHandle,tmpTargetHandle, hHexHandlerLabel, hIntHandlerLabel, hWindowTitleLabel, hCaptureButton;
 int interceptIsOn = 0;
+
+void updateLabelWithHandles() {
+	char strHexHandle[64], strIntHandle[64], title[500];
+	sprintf_s(strHexHandle, "%p", targetHandle);
+	sprintf_s(strIntHandle, "%d", targetHandle);
+	GetWindowText(targetHandle, title, 500);
+	SetWindowTextA(hWindowTitleLabel, title);
+	SetWindowTextA(hHexHandlerLabel, strHexHandle);
+	SetWindowTextA(hIntHandlerLabel, strIntHandle);
+}
 _declspec(dllexport) LRESULT CALLBACK MouseEvent(int Code, WPARAM wParam, LPARAM lParam) {
 	
 	if (Code == HC_ACTION) {
@@ -20,12 +33,8 @@ _declspec(dllexport) LRESULT CALLBACK MouseEvent(int Code, WPARAM wParam, LPARAM
 		{
 			if (interceptIsOn == 1) {
 				MSLLHOOKSTRUCT mouse = *((MSLLHOOKSTRUCT*)lParam);
-				HWND targetHandle = WindowFromPoint(mouse.pt);
-				char strHexHandle[64], strIntHandle[64];
-				sprintf_s(strHexHandle, "%p", targetHandle);
-				sprintf_s(strIntHandle, "%d", targetHandle);
-				SetWindowTextA(hHexHandlerLabel, strHexHandle);
-				SetWindowTextA(hIntHandlerLabel, strIntHandle);
+				targetHandle = WindowFromPoint(mouse.pt);
+				updateLabelWithHandles();
 			}			
 		}
 			break;
@@ -92,9 +101,50 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 
 		hHexHandlerLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "Hex Handle", WS_CHILD | WS_VISIBLE |SS_CENTER, 7, 80, 80, 25, hwnd, (HMENU)123, NULL, NULL);
 		hIntHandlerLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "Int Handle", WS_CHILD | WS_VISIBLE | SS_CENTER, 241, 80, 80, 25, hwnd, (HMENU)124, NULL, NULL);
-		hCaptureButton = CreateWindowEx(WS_EX_STATICEDGE, "BUTTON", "Capture window", WS_CHILD | WS_VISIBLE, 87, 80, 154, 25, hwnd, (HMENU)hookButton, NULL, NULL);
+		hWindowTitleLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "Name", WS_CHILD | WS_VISIBLE | SS_CENTER, 7, 55, 314, 25, hwnd, (HMENU)125, NULL, NULL);
+
+		hCaptureButton = CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Capture window", WS_CHILD | WS_VISIBLE, 87, 80, 154, 25, hwnd, (HMENU)hookButton, NULL, NULL);
+		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Parent", WS_CHILD | WS_VISIBLE, 87, 150, 154, 25, hwnd, (HMENU)getParentButton, NULL, NULL);
+		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Child", WS_CHILD | WS_VISIBLE, 87, 200, 154, 25, hwnd, (HMENU)getChildButton, NULL, NULL);
+		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Prev", WS_CHILD | WS_VISIBLE, 87, 175, 77, 25, hwnd, (HMENU)getPrevButton, NULL, NULL);
+		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Next", WS_CHILD | WS_VISIBLE, 164, 175, 77, 25, hwnd, (HMENU)getNextButton, NULL, NULL);
 		break;
 	}
+	case WM_COMMAND:
+		switch (LOWORD(wParam))
+		{
+		case getParentButton:
+			tmpTargetHandle=GetParent(targetHandle);
+			if (tmpTargetHandle != NULL) {
+				targetHandle = tmpTargetHandle;
+				updateLabelWithHandles();
+			}
+			break;
+		case getChildButton:
+			tmpTargetHandle =GetWindow(targetHandle, GW_CHILD);
+			if (tmpTargetHandle != NULL) {
+				targetHandle = tmpTargetHandle;
+				updateLabelWithHandles();
+			}
+			break;
+		case getNextButton:
+			tmpTargetHandle = GetWindow(targetHandle, GW_HWNDNEXT);
+			if (tmpTargetHandle != NULL) {
+				targetHandle = tmpTargetHandle;
+				updateLabelWithHandles();
+			}
+			break;
+		case getPrevButton:
+			tmpTargetHandle = GetWindow(targetHandle, GW_HWNDPREV);
+			if (tmpTargetHandle != NULL) {
+				targetHandle = tmpTargetHandle;
+				updateLabelWithHandles();
+			}
+			break;
+		default:
+			break;
+		}
+		break;
 	case WM_CLOSE:
 		DestroyWindow(hwnd);
 		break;
