@@ -9,10 +9,11 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #define getChildButton 14
 #define getPrevButton 15
 #define getNextButton 16
+#define actionListId 21
 LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 DWORD WINAPI HookThreadFunc(LPVOID);
 HHOOK hhk;
-HWND targetHandle,tmpTargetHandle, hHexHandlerLabel, hIntHandlerLabel, hWindowTitleLabel, hWindowClassNameLabel, hCaptureButton;
+HWND actionsList, targetHandle,tmpTargetHandle, hHexHandlerLabel, hIntHandlerLabel, hWindowTitleLabel, hWindowClassNameLabel, hCaptureButton;
 int interceptIsOn = 0;
 
 void updateLabelWithHandles() {
@@ -111,6 +112,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Child", WS_CHILD | WS_VISIBLE, 87, 200, 154, 25, hwnd, (HMENU)getChildButton, NULL, NULL);
 		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Prev", WS_CHILD | WS_VISIBLE, 87, 175, 77, 25, hwnd, (HMENU)getPrevButton, NULL, NULL);
 		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Next", WS_CHILD | WS_VISIBLE, 164, 175, 77, 25, hwnd, (HMENU)getNextButton, NULL, NULL);
+		
+		char actions[][20] = { "Enable", "Disable", "Maximize", "Minimize", "Show", "Hide", "Flash", "Close", "Restore"};
+		actionsList = CreateWindowEx(WS_EX_CLIENTEDGE, "LISTBOX", NULL, WS_CHILD | WS_VISIBLE | LBS_NOTIFY | WS_VSCROLL | ES_AUTOVSCROLL, 7, 250, 314, 100, hwnd, (HMENU)actionListId, NULL, NULL);
+		for (int i = 0; i < ARRAYSIZE(actions); i++) {
+			SendMessage(actionsList, LB_ADDSTRING, 0, (LPARAM)actions[i]);
+		}
 		break;
 	}
 	case WM_COMMAND:
@@ -144,6 +151,40 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 				updateLabelWithHandles();
 			}
 			break;
+		case actionListId:
+			if (HIWORD(wParam) == LBN_SELCHANGE){
+				int selected = SendMessage(actionsList, LB_GETCURSEL, 0, 0);
+				switch (selected) {
+				case 0:
+					EnableWindow(targetHandle, TRUE);
+					break;
+				case 1:
+					EnableWindow(targetHandle, FALSE);
+					break;
+				case 2:
+					SendMessage(targetHandle, WM_SYSCOMMAND, SC_MAXIMIZE, 0);
+					break;
+				case 3:
+					SendMessage(targetHandle, WM_SYSCOMMAND, SC_MINIMIZE, 0);
+					break;
+				case 4:
+					ShowWindow(targetHandle, SW_SHOW);
+					break;
+				case 5:
+					ShowWindow(targetHandle, SW_HIDE);
+					break;
+				case 6:
+					FlashWindow(targetHandle, TRUE);
+					break;
+				case 7:
+					SendMessage(targetHandle, WM_CLOSE,0,0);
+					break;
+				case 8:
+					SendMessage(targetHandle, WM_SYSCOMMAND, SC_RESTORE, 0);
+					break;
+				}
+
+			}
 		default:
 			break;
 		}
