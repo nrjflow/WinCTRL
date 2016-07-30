@@ -80,7 +80,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE prevInstance, LPSTR lpCmdLine,
 	if (!RegisterClassEx(&wc)) {
 		MessageBox(NULL, "Error registering", "Error", MB_ICONEXCLAMATION | MB_OK);
 	}
-	hwnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_TOPMOST, "FirstWnd", "Window Controller", WS_OVERLAPPEDWINDOW^WS_THICKFRAME^WS_MAXIMIZEBOX, 500, 100, 345, 420, NULL, NULL, hInstance, NULL);
+	hwnd = CreateWindowEx(WS_EX_APPWINDOW | WS_EX_TOPMOST, "FirstWnd", "Parasite", WS_OVERLAPPEDWINDOW^WS_THICKFRAME^WS_MAXIMIZEBOX, 500, 100, 345, 420, NULL, NULL, hInstance, NULL);
 
 	ShowWindow(hwnd, nCmdShow);
 	UpdateWindow(hwnd);
@@ -200,7 +200,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 	}
 	return 0;
 }
-
 
 
 DWORD WINAPI HookThreadFunc(LPVOID Param) {
