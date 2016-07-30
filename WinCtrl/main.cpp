@@ -107,7 +107,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam){
 		hWindowTitleLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "Name", WS_CHILD | WS_VISIBLE | SS_CENTER, 7, 55, 314, 25, hwnd, (HMENU)125, NULL, NULL);
 		hWindowClassNameLabel = CreateWindowEx(WS_EX_STATICEDGE, "STATIC", "ClassName", WS_CHILD | WS_VISIBLE | SS_CENTER, 7, 105, 314, 25, hwnd, (HMENU)126, NULL, NULL);
 
-		hCaptureButton = CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Capture window", WS_CHILD | WS_VISIBLE, 87, 80, 154, 25, hwnd, (HMENU)hookButton, NULL, NULL);
+		hCaptureButton = CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Click and Drag", WS_CHILD | WS_VISIBLE, 87, 80, 154, 25, hwnd, (HMENU)hookButton, NULL, NULL);
 		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Parent", WS_CHILD | WS_VISIBLE, 87, 150, 154, 25, hwnd, (HMENU)getParentButton, NULL, NULL);
 		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Child", WS_CHILD | WS_VISIBLE, 87, 200, 154, 25, hwnd, (HMENU)getChildButton, NULL, NULL);
 		CreateWindowEx(WS_EX_WINDOWEDGE, "BUTTON", "Prev", WS_CHILD | WS_VISIBLE, 87, 175, 77, 25, hwnd, (HMENU)getPrevButton, NULL, NULL);
